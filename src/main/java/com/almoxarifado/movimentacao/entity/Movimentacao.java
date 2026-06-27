@@ -58,6 +58,12 @@ public class Movimentacao {
     @Column(name = "numero_documento", length = 50)
     private String numeroDocumento;
 
+    @Column(name = "estoque_antes", precision = 10, scale = 3)
+    private BigDecimal estoqueAntes;
+
+    @Column(name = "estoque_depois", precision = 10, scale = 3)
+    private BigDecimal estoqueDepois;
+
     @CreationTimestamp
     @Column(name = "criado_em", updatable = false)
     private LocalDateTime criadoEm;
