@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -29,7 +30,7 @@ public class ProdutoController {
     @GetMapping
     @Operation(summary = "Listar todos os produtos paginados")
     public Page<ProdutoResponse> listar(
-            @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
         return produtoService.listar(pageable);
     }
 
