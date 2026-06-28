@@ -28,3 +28,16 @@ jwt:
 logging:
   level:
     com.almoxarifado: DEBUG
+
+cors:
+  allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
+
+empresa:
+  razao-social: "Almoxarifado Ltda"
+  cnpj: "00.000.000/0001-00"
+  endereco: "Rua das Indústrias, 100 - São Paulo/SP - CEP 01310-100"
+  telefone: "(11) 3000-0000"
+  email: "contato@almoxarifado.com.br"
+
+nota-fiscal:
+  pdf-dir: ${PDF_DIR:${java.io.tmpdir}/almoxarifado/notas-fiscais}
