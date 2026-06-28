@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,4 +34,17 @@ public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Long
     );
 
     List<Movimentacao> findTop10ByOrderByCriadoEmDesc();
+
+    long countByCriadoEmBetween(LocalDateTime inicio, LocalDateTime fim);
+
+    @Query("""
+            SELECT m.tipo, COUNT(m), COALESCE(SUM(m.valorTotal), 0)
+            FROM Movimentacao m
+            WHERE m.criadoEm BETWEEN :inicio AND :fim
+            GROUP BY m.tipo
+            """)
+    List<Object[]> resumoPorTipoNoPeriodo(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim
+    );
 }
