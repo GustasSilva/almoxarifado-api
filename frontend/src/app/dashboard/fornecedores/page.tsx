@@ -53,10 +53,7 @@ export default function FornecedoresPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Fornecedores</h1>
-          <p className="text-sm text-slate-500">Cadastro de fornecedores</p>
-        </div>
+        <p className="text-sm text-slate-500">Cadastro de fornecedores</p>
         <Button onClick={openNew} className="bg-blue-700 hover:bg-blue-800">
           <Plus size={16} className="mr-2" /> Novo fornecedor
         </Button>

@@ -7,7 +7,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import api from "@/lib/api";
-import { Produto, Page } from "@/types";
+import { Produto, Categoria, Page } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +38,11 @@ export default function ProdutosPage() {
   const { data, isLoading } = useQuery<Page<Produto>>({
     queryKey: ["produtos", page],
     queryFn: () => api.get(`/api/produtos?page=${page}&size=10&sort=nome`).then((r) => r.data),
+  });
+
+  const { data: categorias = [] } = useQuery<Categoria[]>({
+    queryKey: ["categorias"],
+    queryFn: () => api.get("/api/categorias").then((r) => r.data),
   });
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
@@ -71,7 +76,7 @@ export default function ProdutosPage() {
 
   function openNew() {
     setEditing(null);
-    reset({ codigo: "", nome: "", descricao: "", unidadeMedida: "UN", estoqueMinimo: 0, precoCusto: 0 });
+    reset({ codigo: "", nome: "", descricao: "", unidadeMedida: "UN", estoqueMinimo: 0, precoCusto: 0, categoriaId: null });
     setOpen(true);
   }
 
@@ -80,7 +85,7 @@ export default function ProdutosPage() {
     reset({
       codigo: p.codigo, nome: p.nome, descricao: p.descricao ?? "",
       unidadeMedida: p.unidadeMedida, estoqueMinimo: p.estoqueMinimo,
-      precoCusto: p.precoCusto, categoriaId: p.categoria?.id,
+      precoCusto: p.precoCusto, categoriaId: p.categoriaId ?? null,
     });
     setOpen(true);
   }
@@ -88,10 +93,7 @@ export default function ProdutosPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Produtos</h1>
-          <p className="text-sm text-slate-500">Catálogo de produtos do almoxarifado</p>
-        </div>
+        <p className="text-sm text-slate-500">Catálogo de produtos do almoxarifado</p>
         <Button onClick={openNew} className="bg-blue-700 hover:bg-blue-800">
           <Plus size={16} className="mr-2" /> Novo produto
         </Button>
@@ -103,6 +105,7 @@ export default function ProdutosPage() {
             <TableRow>
               <TableHead>Código</TableHead>
               <TableHead>Nome</TableHead>
+              <TableHead>Categoria</TableHead>
               <TableHead>UN</TableHead>
               <TableHead className="text-right">Estoque</TableHead>
               <TableHead className="text-right">Mínimo</TableHead>
@@ -113,12 +116,13 @@ export default function ProdutosPage() {
           </TableHeader>
           <TableBody>
             {isLoading && (
-              <TableRow><TableCell colSpan={8} className="text-center py-8 text-slate-400">Carregando...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={9} className="text-center py-8 text-slate-400">Carregando...</TableCell></TableRow>
             )}
             {data?.content.map((p) => (
               <TableRow key={p.id}>
                 <TableCell className="font-mono text-sm">{p.codigo}</TableCell>
                 <TableCell className="font-medium">{p.nome}</TableCell>
+                <TableCell className="text-sm text-slate-500">{p.categoriaNome ?? <span className="text-slate-300">—</span>}</TableCell>
                 <TableCell>{p.unidadeMedida}</TableCell>
                 <TableCell className={`text-right font-medium ${p.estoqueAtual < p.estoqueMinimo ? "text-red-500" : ""}`}>
                   {p.estoqueAtual}
@@ -168,7 +172,7 @@ export default function ProdutosPage() {
               </div>
               <div className="space-y-1">
                 <Label>Unidade</Label>
-                <select className="w-full border rounded-md px-3 py-2 text-sm" {...register("unidadeMedida")}>
+                <select {...register("unidadeMedida")}>
                   {UNIDADES.map((u) => <option key={u}>{u}</option>)}
                 </select>
               </div>
@@ -178,9 +182,20 @@ export default function ProdutosPage() {
               <Input {...register("nome")} />
               {errors.nome && <p className="text-xs text-red-500">{errors.nome.message}</p>}
             </div>
-            <div className="space-y-1">
-              <Label>Descrição</Label>
-              <Input {...register("descricao")} />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label>Categoria</Label>
+                <select {...register("categoriaId")}>
+                  <option value="">Sem categoria</option>
+                  {categorias.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nome}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1">
+                <Label>Descrição</Label>
+                <Input {...register("descricao")} />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">

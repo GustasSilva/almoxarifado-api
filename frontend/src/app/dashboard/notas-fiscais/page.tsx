@@ -93,10 +93,7 @@ export default function NotasFiscaisPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Notas Fiscais</h1>
-          <p className="text-sm text-slate-500">Emissão e download de notas fiscais</p>
-        </div>
+        <p className="text-sm text-slate-500">Emissão e download de notas fiscais</p>
         <Button onClick={() => { reset(); setOpen(true); }} className="bg-blue-700 hover:bg-blue-800">
           <Plus size={16} className="mr-2" /> Emitir NF
         </Button>

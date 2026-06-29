@@ -51,10 +51,7 @@ export default function CategoriasPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Categorias</h1>
-          <p className="text-sm text-slate-500">Classificação dos produtos</p>
-        </div>
+        <p className="text-sm text-slate-500">Classificação dos produtos</p>
         <Button onClick={openNew} className="bg-blue-700 hover:bg-blue-800">
           <Plus size={16} className="mr-2" /> Nova categoria
         </Button>

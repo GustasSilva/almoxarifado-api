@@ -1,5 +1,9 @@
 package com.almoxarifado.notafiscal.service;
 
+import com.almoxarifado.movimentacao.dto.MovimentacaoRequest;
+import com.almoxarifado.movimentacao.entity.MotivoMovimentacao;
+import com.almoxarifado.movimentacao.entity.TipoMovimentacao;
+import com.almoxarifado.movimentacao.service.MovimentacaoService;
 import com.almoxarifado.notafiscal.dto.NotaFiscalItemRequest;
 import com.almoxarifado.notafiscal.dto.NotaFiscalRequest;
 import com.almoxarifado.notafiscal.dto.NotaFiscalResponse;
@@ -26,6 +30,7 @@ public class NotaFiscalService {
     private final ProdutoRepository produtoRepository;
     private final EmpresaProperties empresaProperties;
     private final PdfNotaFiscalService pdfService;
+    private final MovimentacaoService movimentacaoService;
 
     @Transactional
     public NotaFiscalResponse emitir(NotaFiscalRequest request) {
@@ -52,6 +57,8 @@ public class NotaFiscalService {
         nf.setValorTotal(total);
 
         NotaFiscal saved = notaFiscalRepository.save(nf);
+
+        movimentarEstoque(saved, request.tipo());
 
         String pdfPath = pdfService.gerarPdf(saved);
         saved.setPdfPath(pdfPath);
@@ -80,6 +87,27 @@ public class NotaFiscalService {
             return pdfService.lerPdf(nf.getPdfPath());
         } catch (Exception e) {
             throw new RuntimeException("Erro ao ler o PDF da Nota Fiscal: " + e.getMessage(), e);
+        }
+    }
+
+    private void movimentarEstoque(NotaFiscal nf, TipoMovimentacao tipo) {
+        MotivoMovimentacao motivo = tipo == TipoMovimentacao.SAIDA
+                ? MotivoMovimentacao.VENDA
+                : MotivoMovimentacao.COMPRA;
+
+        for (NotaFiscalItem item : nf.getItens()) {
+            if (item.getProduto() == null) continue;
+
+            movimentacaoService.registrar(new MovimentacaoRequest(
+                    tipo,
+                    motivo,
+                    item.getProduto().getId(),
+                    item.getQuantidade(),
+                    item.getPrecoUnitario(),
+                    null,
+                    "NF " + nf.getNumero() + "/" + nf.getSerie(),
+                    nf.getNumero()
+            ));
         }
     }
 

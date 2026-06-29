@@ -33,13 +33,13 @@ export interface Produto {
   codigo: string;
   nome: string;
   descricao?: string;
+  categoriaId?: number;
+  categoriaNome?: string;
   unidadeMedida: string;
   estoqueAtual: number;
   estoqueMinimo: number;
   precoCusto: number;
   ativo: boolean;
-  categoria?: Categoria;
-  fornecedor?: Fornecedor;
 }
 
 export interface Movimentacao {
